@@ -13,4 +13,4 @@ RUN npx playwright install --with-deps chromium
 COPY --from=builder ./node_modules ./node_modules
 COPY --from=builder ./dist .
 
-CMD ["sh"]
+CMD ["node", "index.js"]
