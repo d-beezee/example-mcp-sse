@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { scanViolations } from "./accessibilityChecker";
 
 const mcpServer = new McpServer(
   {
@@ -12,18 +13,47 @@ const mcpServer = new McpServer(
 );
 
 mcpServer.tool(
-  "calculate-bmi",
+  "scan_accessibility",
   {
-    weightKg: z.number(),
-    heightM: z.number(),
+    url: z.string().url(),
+    violationsTag: z.array(z.string()),
+    viewport: z
+      .object({
+        width: z.number().default(1920),
+        height: z.number().default(1080),
+      })
+      .optional(),
+    shouldRunInHeadless: z.boolean().default(true),
   },
-  async ({ weightKg, heightM }) => ({
-    content: [
-      {
-        type: "text",
-        text: String(weightKg / (heightM * heightM)),
-      },
-    ],
-  })
+  async ({ url, violationsTag, viewport, shouldRunInHeadless }) => {
+    const { report, base64Screenshot } = await scanViolations(
+      url,
+      violationsTag,
+      viewport,
+      shouldRunInHeadless
+    );
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(
+            {
+              message: "The image has been saved to your downloads.",
+              ...report,
+            },
+            null,
+            2
+          ),
+        },
+        {
+          type: "image",
+          data: base64Screenshot,
+          mimeType: "image/png",
+        },
+      ],
+      isError: false,
+    };
+  }
 );
 export { mcpServer };
