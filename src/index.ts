@@ -3,4 +3,4 @@ import { createSSEServer } from "./sse-server.js";
 
 const sseServer = createSSEServer(mcpServer);
 
-sseServer.listen(process.env.PORT || 3001);
+sseServer.listen(3000);

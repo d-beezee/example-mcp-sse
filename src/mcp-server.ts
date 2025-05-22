@@ -1,37 +1,29 @@
-import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
 
-const mcpServer = new McpServer({
-  name: "ExampleMCPServer",
-  version: "1.0.0"
-}, {
-  capabilities: {},
-});
-
-mcpServer.resource(
-  'document',
-  new ResourceTemplate("document://{name}", {
-    list: async () => {
-      return {
-        resources: [
-          {
-            name: 'document-getting-started',
-            uri: 'document://getting-started',
-          }
-        ]
-      }
-    }
-  }),
-  async (uri, variables) => {
-    return {
-      contents: [
-        {
-          uri: uri.href,
-          text: 'Getting Started',
-          mimeType: 'text/plain'
-        }
-      ]
-    }
+const mcpServer = new McpServer(
+  {
+    name: "ExampleMCPServer",
+    version: "1.0.0",
+  },
+  {
+    capabilities: {},
   }
 );
 
+mcpServer.tool(
+  "calculate-bmi",
+  {
+    weightKg: z.number(),
+    heightM: z.number(),
+  },
+  async ({ weightKg, heightM }) => ({
+    content: [
+      {
+        type: "text",
+        text: String(weightKg / (heightM * heightM)),
+      },
+    ],
+  })
+);
 export { mcpServer };
