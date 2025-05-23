@@ -26,7 +26,7 @@ mcpServer.tool(
     shouldRunInHeadless: z.boolean().default(true),
   },
   async ({ url, violationsTag, viewport, shouldRunInHeadless }) => {
-    const { report, base64Screenshot } = await scanViolations(
+    const { report, screenshots } = await scanViolations(
       url,
       violationsTag,
       viewport,
@@ -46,11 +46,11 @@ mcpServer.tool(
             2
           ),
         },
-        {
-          type: "image",
-          data: base64Screenshot,
-          mimeType: "image/png",
-        },
+        ...screenshots.map((screenshot) => ({
+          type: "image" as const,
+          data: screenshot.screenshot,
+          mimeType: "image/jpeg",
+        })),
       ],
       isError: false,
     };
