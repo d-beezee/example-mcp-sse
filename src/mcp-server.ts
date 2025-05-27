@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { scanViolations } from "./accessibilityChecker";
+import { scrape } from "./scraper";
 
 const mcpServer = new McpServer(
   {
@@ -9,6 +10,33 @@ const mcpServer = new McpServer(
   },
   {
     capabilities: {},
+  }
+);
+
+mcpServer.tool(
+  "scrape",
+  {
+    url: z.string().url(),
+    maxDepth: z.number().default(2),
+  },
+  async ({ url, maxDepth }) => {
+    const { result } = await scrape(url, maxDepth);
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(
+            {
+              message: "The links have been scraped successfully.",
+              links: result,
+            },
+            null,
+            2
+          ),
+        },
+      ],
+      isError: false,
+    };
   }
 );
 

@@ -16,8 +16,8 @@ export function createSSEServer(mcpServer: McpServer) {
   app.post("/messages", (req, res) => {
     const sessionId = req.query.sessionId as string;
     if (!sessionId) {
-      console.error('Message received without sessionId');
-      res.status(400).json({ error: 'sessionId is required' });
+      console.error("Message received without sessionId");
+      res.status(400).json({ error: "sessionId is required" });
       return;
     }
 
