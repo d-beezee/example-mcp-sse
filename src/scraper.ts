@@ -15,7 +15,10 @@ export async function scrape(url: string, maxDepth: number) {
   const visited = new Set<string>();
   const result: string[] = [];
 
-  const browser = await puppeteer.launch({ headless: true });
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
   const page = await browser.newPage();
 
   async function crawl(url: string, depth: number) {

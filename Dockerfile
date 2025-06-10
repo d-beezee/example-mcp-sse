@@ -9,6 +9,7 @@ FROM node:22-slim
 WORKDIR /app
 
 RUN npx playwright install --with-deps chromium
+RUN npx puppeteer browsers install chrome
 
 COPY --from=builder ./node_modules ./node_modules
 COPY --from=builder ./dist .
